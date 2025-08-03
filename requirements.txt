@@ -1,0 +1,6 @@
+pandas
+numpy
+matplotlib
+psycopg2
+tabulate
+jinja2
