@@ -1,5 +1,9 @@
 import argparse
 from db import add_expense, fetch_all_expenses, create_table
+from analytics import load_data  # Or your DB fetch
+from visuals import plot_category_spend, plot_monthly_spend,plot_category_pie, plot_amount_histogram
+from analytics import run_export
+
 
 def main():
     parser=argparse.ArgumentParser(description="📊 Personal Expense Tracker")
@@ -16,6 +20,22 @@ def main():
     view_parser = subparsers.add_parser("view", help="View all expenses")
     view_parser.add_argument("--category", help="Filter by category")
     view_parser.add_argument("--month", help="Filter by month (format: YYYY-MM)")
+
+    # Inside your argparse setup  - export subcommand
+    export_parser = subparsers.add_parser("export", help="Export expenses to CSV or HTML")
+    export_parser.add_argument("--filetype", choices=["csv", "html"], required=True)
+    export_parser.add_argument("--filename", type=str, default="report")
+
+    #parser for visulaization part
+    visual_parser = subparsers.add_parser("visual", help="Visualize expense data")
+    visual_parser.add_argument(
+        "--type", 
+        choices=["category", "monthly", "pie", "histogram"], 
+        required=True, 
+        help="Type of visualization (category, monthly, pie, histogram)"
+    )
+
+
 
     args = parser.parse_args()
 
@@ -43,6 +63,22 @@ def main():
             print("📄 Filtered Expenses:")
             for exp in filtered:
                 print(f"{exp[0]} | {exp[1]} | ₹{exp[4]} | {exp[2]} | {exp[3]}")
+
+    elif args.command == "export":
+        df = load_data()
+        run_export(df, args.filetype, args.filename)
+
+    elif args.command == "visual":
+        df = load_data()
+        if args.type == "category":
+            plot_category_spend(df)
+        elif args.type == "monthly":
+            plot_monthly_spend(df)
+        elif args.type == "pie":
+            plot_category_pie(df)
+        elif args.type == "histogram":
+            plot_amount_histogram(df)
+
 
     else:
         parser.print_help()

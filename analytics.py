@@ -1,5 +1,16 @@
 import pandas as pd
 from db import fetch_all_expenses
+from export import export_to_csv, export_to_html
+import matplotlib.pyplot as plt
+
+from visuals import (
+    plot_category_spend,
+    plot_monthly_spend,
+    plot_category_pie,
+    plot_amount_histogram
+)
+
+
 
 def load_data():
     """
@@ -24,14 +35,31 @@ def top_categories(df, n=5):
     """
     return df.groupby('category')['amount'].sum().sort_values(ascending=False).head(n)
 
+
+
+def run_export(df, filetype='csv', filename='report'):
+    if filetype == 'csv':
+        export_to_csv(df, f"{filename}.csv")
+    elif filetype == 'html':
+        export_to_html(df, f"{filename}.html")
+    else:
+        print("❌ Unsupported export type. Choose csv or html.")
+
+
+
+
+
+
 # Test if run directly  - temporary test block
-if __name__ == "__main__":
-    df = load_data()
-    print("📅 Monthly Summary:")
-    print(monthly_summary(df))
+# if __name__ == "__main__":
+#     df = load_data()
+#     print("📅 Monthly Summary:")
+#     print(monthly_summary(df))
     
-    print("\n🔥 Top Spending Categories:")
-    print(top_categories(df))
+#     print("\n🔥 Top Spending Categories:")
+#     print(top_categories(df))
+
+
 
 
 
