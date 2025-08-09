@@ -3,6 +3,7 @@ from db import add_expense, fetch_all_expenses, create_table
 from analytics import load_data  # Or your DB fetch
 from visuals import plot_category_spend, plot_monthly_spend,plot_category_pie, plot_amount_histogram
 from analytics import run_export
+from db import update_expense
 
 
 def main():
@@ -34,6 +35,30 @@ def main():
         required=True, 
         help="Type of visualization (category, monthly, pie, histogram)"
     )
+
+    # --- Inside your argparse setup ---
+    analytics_parser = subparsers.add_parser("analytics", help="View analytics reports")
+    analytics_parser.add_argument(
+        "--type",
+        choices=["monthly", "top_categories", "summary"],
+        required=True,
+        help="Type of analytics to display"
+    )
+
+    # update subcommand
+    update_parser = subparsers.add_parser("update", help="Update an existing expense by ID")
+    update_parser.add_argument("id", type=int, help="ID of the expense to update")
+    update_parser.add_argument("--date", type=str, help="New date (YYYY-MM-DD)")
+    update_parser.add_argument("--category", type=str, help="New category")
+    update_parser.add_argument("--description", type=str, help="New description")
+    update_parser.add_argument("--amount", type=float, help="New amount")
+
+    # delete subcommand
+    delete_parser = subparsers.add_parser("delete", help="Delete an expense by ID")
+    delete_parser.add_argument("id", type=int, help="ID of the expense to delete")
+    delete_parser.add_argument("--yes", action="store_true", help="Skip confirmation prompt")
+
+
 
 
 
@@ -78,6 +103,43 @@ def main():
             plot_category_pie(df)
         elif args.type == "histogram":
             plot_amount_histogram(df)
+
+    elif args.command == "analytics":
+        df = load_data()
+
+        if args.type == "monthly":
+            from analytics import monthly_summary
+            summary = monthly_summary(df)
+            print(summary)
+
+        elif args.type == "top_categories":
+            from analytics import top_categories
+            top = top_categories(df)
+            print(top)
+
+        elif args.type == "summary":
+            from analytics import summary_report
+            summary_report(df)
+
+    elif args.command == "update":
+    
+        update_expense(
+            args.id,
+            date=args.date,
+            category=args.category,
+            description=args.description,
+            amount=args.amount
+        )
+
+    elif args.command == "delete":
+        from db import delete_expense
+        if not args.yes:
+            confirm = input(f"Are you sure you want to delete expense {args.id}? (y/N): ").strip().lower()
+            if confirm not in ("y", "yes"):
+                print("Cancelled.")
+                return
+        delete_expense(args.id)
+
 
 
     else:

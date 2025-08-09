@@ -35,6 +35,23 @@ def top_categories(df, n=5):
     """
     return df.groupby('category')['amount'].sum().sort_values(ascending=False).head(n)
 
+def summary_report(df):
+    """
+    Prints an overall summary of expenses:
+    - Total number of expenses
+    - Total spend
+    - Average spend per expense
+    """
+    total_spend = df['amount'].sum()
+    total_expenses = len(df)
+    avg_spend = df['amount'].mean()
+
+    print("\n📊 Overall Summary:")
+    print(f"Total Expenses: {total_expenses}")
+    print(f"Total Spend: ₹{total_spend:.2f}")
+    print(f"Average Spend per Expense: ₹{avg_spend:.2f}")
+
+
 
 
 def run_export(df, filetype='csv', filename='report'):
