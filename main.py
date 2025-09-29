@@ -7,7 +7,7 @@ from db import update_expense
 
 
 def main():
-    parser=argparse.ArgumentParser(description="📊 Personal Expense Tracker")
+    parser=argparse.ArgumentParser(description="📊 Personal Expense Tracker")   #description shows up when user runs -h/--help.
     subparsers=parser.add_subparsers(dest="command")
 
     #subcommand: add
@@ -18,8 +18,9 @@ def main():
     add_parser.add_argument("amount",type=float, help="Amount spent")
 
     # Subcommand: view
-    view_parser = subparsers.add_parser("view", help="View all expenses")
-    view_parser.add_argument("--category", help="Filter by category")
+    view_parser = subparsers.add_parser("view", help="View all expenses") #Adds an another optional argument called category in view subparser user can filter the records based on cvategory of the item
+    #If not provided args.category will be None(default)
+    view_parser.add_argument("--category",help="Filter by category")
     view_parser.add_argument("--month", help="Filter by month (format: YYYY-MM)")
 
     # Inside your argparse setup  - export subcommand
@@ -40,9 +41,16 @@ def main():
     analytics_parser = subparsers.add_parser("analytics", help="View analytics reports")
     analytics_parser.add_argument(
         "--type",
-        choices=["monthly", "top_categories", "summary"],
+        choices=["monthly", "top categories", "summary"],
         required=True,
         help="Type of analytics to display"
+    )
+    # Optional argument for top N categories
+    analytics_parser.add_argument(
+        "--number_of_records",
+        type=int,
+        default=5,  # default top 5
+        help="Number of top categories to display (only works with --type 'top categories')"
     )
 
     # update subcommand
@@ -55,7 +63,7 @@ def main():
 
     # delete subcommand
     delete_parser = subparsers.add_parser("delete", help="Delete an expense by ID")
-    delete_parser.add_argument("id", type=int, help="ID of the expense to delete")
+    delete_parser.add_argument("id", type=int, nargs="+",help="ID of the expense to delete")
     delete_parser.add_argument("--yes", action="store_true", help="Skip confirmation prompt")
 
 
@@ -63,6 +71,13 @@ def main():
 
 
     args = parser.parse_args()
+    # args now contains all the values:
+    # args.command     # "add"
+    # args.date        # "2025-09-29"
+    # args.category    # "Food"
+    # args.description # "Lunch"
+    # args.amount      # 250.0
+
 
     if args.command == "add":
         add_expense(args.date, args.category, args.description, args.amount)
@@ -85,7 +100,7 @@ def main():
         if not filtered:
             print("❌ No matching expenses found.")
         else:
-            print("📄 Filtered Expenses:")
+            print("📄 Expenses:")
             for exp in filtered:
                 print(f"{exp[0]} | {exp[1]} | ₹{exp[4]} | {exp[2]} | {exp[3]}")
 
@@ -112,9 +127,10 @@ def main():
             summary = monthly_summary(df)
             print(summary)
 
-        elif args.type == "top_categories":
+        elif args.type == "top categories":
             from analytics import top_categories
-            top = top_categories(df)
+            n=args.number_of_records  # use the number provided or use default if not provided
+            top = top_categories(df,n)
             print(top)
 
         elif args.type == "summary":
@@ -138,7 +154,8 @@ def main():
             if confirm not in ("y", "yes"):
                 print("Cancelled.")
                 return
-        delete_expense(args.id)
+        for expense_id in args.id:
+            delete_expense(expense_id)
 
 
 

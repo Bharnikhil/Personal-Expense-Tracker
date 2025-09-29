@@ -29,7 +29,7 @@ def monthly_summary(df):
     summary = df.groupby(['month', 'category'])['amount'].sum().unstack().fillna(0)
     return summary
 
-def top_categories(df, n=5):
+def top_categories(df,n):
     """
     Returns the top N categories by total spend.
     """

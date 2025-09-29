@@ -4,7 +4,7 @@ DB_CONFIG = {
     "host": "localhost",
     "database": "expense_db",
     "user": "postgres",
-    "password": "S19T20V22K11"
+    "password": "Your Password here"
 }
 
 def get_connection():
