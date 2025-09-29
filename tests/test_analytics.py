@@ -1,4 +1,4 @@
-from analytics import load_data, monthly_summary,top_categories
+from modules.analytics import load_data, monthly_summary,top_categories
 
 def test_analytics_functions():
     df = load_data()

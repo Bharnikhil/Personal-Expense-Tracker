@@ -1,9 +1,9 @@
 import pandas as pd
-from db import fetch_all_expenses
-from export import export_to_csv, export_to_html
+from modules.db import fetch_all_expenses
+from modules.export import export_to_csv, export_to_html
 import matplotlib.pyplot as plt
 
-from visuals import (
+from modules.visuals import (
     plot_category_spend,
     plot_monthly_spend,
     plot_category_pie,

@@ -1,9 +1,9 @@
 import argparse
-from db import add_expense, fetch_all_expenses, create_table
-from analytics import load_data  # Or your DB fetch
-from visuals import plot_category_spend, plot_monthly_spend,plot_category_pie, plot_amount_histogram
-from analytics import run_export
-from db import update_expense
+from modules.db import add_expense, fetch_all_expenses, create_table
+from modules.analytics import load_data  # Or your DB fetch
+from modules.visuals import plot_category_spend, plot_monthly_spend,plot_category_pie, plot_amount_histogram
+from modules.analytics import run_export
+from modules.db import update_expense
 
 
 def main():
@@ -123,18 +123,18 @@ def main():
         df = load_data()
 
         if args.type == "monthly":
-            from analytics import monthly_summary
+            from modules.analytics import monthly_summary
             summary = monthly_summary(df)
             print(summary)
 
         elif args.type == "top categories":
-            from analytics import top_categories
+            from modules.analytics import top_categories
             n=args.number_of_records  # use the number provided or use default if not provided
             top = top_categories(df,n)
             print(top)
 
         elif args.type == "summary":
-            from analytics import summary_report
+            from modules.analytics import summary_report
             summary_report(df)
 
     elif args.command == "update":
@@ -148,7 +148,7 @@ def main():
         )
 
     elif args.command == "delete":
-        from db import delete_expense
+        from modules.db import delete_expense
         if not args.yes:
             confirm = input(f"Are you sure you want to delete expense {args.id}? (y/N): ").strip().lower()
             if confirm not in ("y", "yes"):
